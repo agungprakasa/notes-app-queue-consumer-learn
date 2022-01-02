@@ -1,42 +1,28 @@
-#!/usr/bin/env groovy
-pipeline {
-  agent { label 'linux' }
-  environment {
-    NODE_ENV_PATH = './venv'
-    NODE_VERSION = '6.11.1'
-  }
+Pipeline {
+  agent any
+    
+  tools {nodejs "node"}
+    
   stages {
-    stage('Pre-cleanup') {
+        
+    stage('Git') {
       steps {
-        sh 'rm -rf ./venv'
-        sh 'rm -rf ./node_modules'
-        sh 'rm -rf ./bower_components'
+        git 'https://github.com/agungprakasa/notes-app-queue-consumer-learn.git'
       }
     }
-    stage('Make venv') {
+     
+    stage('Build') {
       steps {
-        sh 'nodeenv --prebuilt -n $NODE_VERSION $NODE_ENV_PATH'
+        sh 'npm install'
+         sh '<<Build Command>>'
       }
-    }
-    stage('Install dependencies') {
+    }  
+    
+            
+    stage('Test') {
       steps {
-        sh '. ./venv/bin/activate && npm install'
-        sh '. ./venv/bin/activate && npm install -g bower'
-        sh '. ./venv/bin/activate && bower install'
+        sh 'node test'
       }
-    }
-    stage('Run tests') {
-      steps {
-        sh '. ./node_env/bin/activate && npm test'
-      }
-    }
-  }
-  post {
-    failure {
-      echo 'Processing failed'
-    }
-    success {
-      echo 'Processing succeeded'
     }
   }
 }
