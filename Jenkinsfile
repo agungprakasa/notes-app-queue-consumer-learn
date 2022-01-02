@@ -4,10 +4,12 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '5'))
     }
     stages {
-        stage('build') {
-            steps {
-                sh 'node --version'
+        stage('Scan') {
+          steps {
+            withSonarQubeEnv(installationName: 'sq1') { 
+              sh './mvnw clean 'node:16.13.1-alpine'
             }
+          }
         }
     }
 }
