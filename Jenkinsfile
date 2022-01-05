@@ -1,28 +1,21 @@
-Pipeline {
+pipeline {
   agent any
-    
-  tools {nodejs "node"}
-    
   stages {
-        
-    stage('Git') {
-      steps {
-        git 'https://github.com/agungprakasa/notes-app-queue-consumer-learn.git'
-      }
-    }
-     
-    stage('Build') {
-      steps {
-        sh 'npm install'
-         sh '<<Build Command>>'
-      }
-    }  
-    
-            
-    stage('Test') {
-      steps {
-        sh 'node test'
-      }
-    }
+  stage('Code Quality Check via SonarQube') {  
+            environment {    
+              SONAR_SCANNER = tool('Sonar Scanner')
+            } 
+            steps {  
+                script {    
+                    withSonarQubeEnv("Sonarqube Server") {
+                      sh """${SONAR_SCANNER}/bin/sonar-scanner \
+                        -Dsonar.sources=. \
+                        -Dsonar.projectKey=laraveldev \
+                        -Dsonar.host.url=${env.SONAR_HOST_URL} \
+                        -Dsonar.login=fd4a7caca1f080fda4444cef90c450fdc4c4320b""" 
+                    }   
+                } 
+            }
+        }
   }
 }
